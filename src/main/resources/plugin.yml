@@ -1,0 +1,9 @@
+name: NoDropsAtSpawn
+author: glguy
+version: 0.1
+main: com.gmail.emertens.nodropsatspawn.NoDropsAtSpawn
+
+permissions:
+  nodropsatspawn.override:
+    description: Allow drops at spawn
+    default: op
