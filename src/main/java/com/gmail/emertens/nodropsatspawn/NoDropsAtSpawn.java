@@ -1,7 +1,7 @@
 package com.gmail.emertens.nodropsatspawn;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
@@ -11,12 +11,16 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import us.talabrek.ultimateskyblock.uSkyBlock;
+
 /**
  * Plug-in for restricting item drops and item pickups at the spawn point.
  * @author Eric Mertens <emertens@gmail.com>
  *
  */
 public final class NoDropsAtSpawn extends JavaPlugin implements Listener {
+
+	private uSkyBlock uSkyBlockPlugin;
 
 	/**
 	 * Optional message sent to player when item drop is denied.
@@ -27,11 +31,6 @@ public final class NoDropsAtSpawn extends JavaPlugin implements Listener {
 	 * Optional message sent to player when item pickup is denied.
 	 */
 	private String noPickupMsg;
-
-	/**
-	 * Spawn square 'radius'
-	 */
-	private int spawnRadius;
 
 	/**
 	 * Bukkit permission for overriding this plug-in
@@ -66,11 +65,9 @@ public final class NoDropsAtSpawn extends JavaPlugin implements Listener {
 	void restrictEvent(final T event, final String msg) {
 
 		final Player player = event.getPlayer();
-		final Location location = player.getLocation();
 
-		// Only protect spawn
-		if (Math.abs(location.getBlockX()) > spawnRadius
-		 || Math.abs(location.getBlockZ()) > spawnRadius) {
+		// Leave players alone on their own islands
+		if (uSkyBlockPlugin.playerIsOnIsland(player)) {
 			return;
 		}
 
@@ -89,7 +86,8 @@ public final class NoDropsAtSpawn extends JavaPlugin implements Listener {
 	public void onEnable() {
 		saveDefaultConfig();
 		loadSettings();
-		getServer().getPluginManager().registerEvents(this, this);
+		uSkyBlockPlugin = (uSkyBlock)Bukkit.getPluginManager().getPlugin("uSkyBlock");
+		Bukkit.getPluginManager().registerEvents(this, this);
 	}
 
 	/**
@@ -108,6 +106,5 @@ public final class NoDropsAtSpawn extends JavaPlugin implements Listener {
 	private void loadSettings() {
 		noDropMsg = loadMessage("item-drop-message");
 		noPickupMsg = loadMessage("item-pickup-message");
-		spawnRadius = getConfig().getInt("spawn-radius", 50);
 	}
 }
